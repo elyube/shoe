@@ -68,7 +68,7 @@ def fiyat_temizle(fiyat_str: str) -> float:
 def veri_kaydet(kayitlar: list) -> None:
     fo.AppendJsonFile(path=DATA_FILE, new_list=kayitlar)
     df = pd.DataFrame(kayitlar)
-    df.to_csv(CSV_FILE, index=False, encoding="utf-8-sig")
+    df.to_csv(CSV_FILE, mode="a", index=False, header=False)
     print(f"  ✓ {len(kayitlar)} kayıt kaydedildi → {DATA_FILE} & {CSV_FILE}")
 
 def derimod_scrape(driver, kategori_url: str, kategori_adi: str, sayfa_limit: int = 5) -> list:
