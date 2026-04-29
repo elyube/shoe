@@ -16,16 +16,18 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import pandas as pd
-import json
 import os
 import time
 import schedule
 from datetime import datetime
 import random
+import file_operations as fo
+import pathlib
 
 # ─── Ayarlar ────────────────────────────────────────────────────────────────
-DATA_FILE = "flo_prices.json"
-CSV_FILE  = "flo_prices.csv"
+THIS_DIR = pathlib.Path(__file__).parent
+DATA_FILE = THIS_DIR.parent / "data" / "flo_prices.json"
+CSV_FILE  = THIS_DIR.parent / "data" / "flo_prices.csv"
 
 KATEGORI_URLS = [
     {
@@ -87,16 +89,9 @@ def fiyat_temizle(fiyat_str: str) -> float:
         return None
 
 
-def veri_yukle() -> list:
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return []
-
 
 def veri_kaydet(kayitlar: list) -> None:
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(kayitlar, f, ensure_ascii=False, indent=2)
+    fo.AppendJsonFile(path=DATA_FILE, new_list=kayitlar)
     df = pd.DataFrame(kayitlar)
     df.to_csv(CSV_FILE, index=False, encoding="utf-8-sig")
     print(f"  ✓ {len(kayitlar)} kayıt kaydedildi → {DATA_FILE} & {CSV_FILE}")
@@ -210,7 +205,7 @@ def tum_kategorileri_scrape():
     driver = tarayici_baslat()
 
     try:
-        mevcut = veri_yukle()
+        mevcut = fo.ReadFromJsonFile(DATA_FILE)
         yeni = []
         for kat in KATEGORI_URLS:
             yeni += flo_scrape(driver, kat["url"], kat["ad"], sayfa_limit=3)
