@@ -17,6 +17,7 @@ import time
 import random
 from datetime import datetime
 import file_operations as fo
+import biçimlendirici as biç
 import pathlib
 from .models.ayakkabı import Ayakkabı
 
@@ -24,6 +25,8 @@ from .models.ayakkabı import Ayakkabı
 THIS_DIR = pathlib.Path(__file__).parent
 DATA_FILE = THIS_DIR.parent / "data" / "derimod_prices.json"
 CSV_FILE  = THIS_DIR.parent / "data" / "derimod_prices.csv"
+
+ONDALIK_AYRACI = '.'
 
 KATEGORI_URLS = [
     {
@@ -49,21 +52,6 @@ def tarayici_baslat():
     )
     service = Service(ChromeDriverManager().install())
     return webdriver.Chrome(service=service, options=options)
-
-def fiyat_temizle(fiyat_str: str) -> float:
-    # Derimod İngilizce format: '3,499.99TL' → virgül binlik, nokta ondalık
-    if not fiyat_str:
-        return None
-    temiz = (
-        fiyat_str.replace("TL", "").replace("₺", "")
-                 .replace("\xa0", "").replace(" ", "")
-                 .replace(",", "")   # binlik virgülü sil
-                 .strip()
-    )
-    try:
-        return float(temiz)
-    except ValueError:
-        return None
 
 
 def veri_kaydet(kayitlar: list) -> None:
@@ -148,16 +136,16 @@ def derimod_scrape(driver, kategori_url: str, kategori_adi: str, sayfa_limit: in
             indirim_el = kart.select_one("[class*='sale-price'], [class*='SalePrice'], ins")
 
             if eski_el and indirim_el:
-                fiyat     = fiyat_temizle(eski_el.get_text(strip=True))
-                indirimli = fiyat_temizle(indirim_el.get_text(strip=True))
+                fiyat     = biç.FiyatTemizle(eski_el.get_text(strip=True), ONDALIK_AYRACI)
+                indirimli = biç.FiyatTemizle(indirim_el.get_text(strip=True), ONDALIK_AYRACI)
             elif fiyat_el:
-                fiyat     = fiyat_temizle(fiyat_el.get_text(strip=True))
+                fiyat     = biç.FiyatTemizle(fiyat_el.get_text(strip=True), ONDALIK_AYRACI)
                 indirimli = None
 
             # Yedek: TL geçen tüm metinleri topla
             if not fiyat:
                 tl_metinler = [t.strip() for t in kart.find_all(string=True) if "TL" in t or "₺" in t]
-                fiyatlar = [fiyat_temizle(t) for t in tl_metinler if fiyat_temizle(t)]
+                fiyatlar = [biç.FiyatTemizle(t, ONDALIK_AYRACI) for t in tl_metinler if biç.FiyatTemizle(t, ONDALIK_AYRACI)]
                 fiyat     = fiyatlar[0] if fiyatlar else None
                 indirimli = fiyatlar[1] if len(fiyatlar) > 1 else None
 

@@ -18,17 +18,18 @@ import time
 import random
 from datetime import datetime
 import file_operations as fo
+import biçimlendirici as biç
 import pathlib
 from .models.ayakkabı import Ayakkabı
 
 
-# Output file paths configuration
 THIS_DIR = pathlib.Path(__file__).parent
 DATA_DIR = THIS_DIR.parent / "data"
 
 DATA_FILE = DATA_DIR / "ayakkabidunyasi_prices.json"
 CSV_FILE  = DATA_DIR / "ayakkabidunyasi_prices.csv"
 
+ONDALIK_AYRACI = '.'
 
 KATEGORI_URLS = [
     {
@@ -116,29 +117,27 @@ def ayakkabidunyasi_scrape(driver, kategori_url: str, kategori_adi: str, sayfa_l
             else:
                 marka = "Bilinmiyor"
 
-            try:
-                fiyat = float(data.get("price", 0))
-            except:
-                fiyat = None
+            ham_fiyat_anlık = str(data.get("price", ""))
+            ham_fiyat_asıl = str(data.get("dimension16", ""))
 
-            try:
-                orijinal = float(data.get("dimension16", 0))
-            except:
-                orijinal = None
-
+            fiyat_anlık = biç.FiyatTemizle(ham_fiyat_anlık, ONDALIK_AYRACI)
+            fiyat_asıl = biç.FiyatTemizle(ham_fiyat_asıl, ONDALIK_AYRACI)
+            
             # dimension17 = indirim durumu
-            indirim_durum = data.get("dimension17", "")
+            indirim_durumu = data.get("dimension17", "")
 
-            if orijinal and fiyat and orijinal > fiyat:
+            if fiyat_asıl and fiyat_asıl and fiyat_asıl > fiyat_anlık:
                 # JSON'da eski ve yeni fiyat farklıysa kullan
-                indirimli     = fiyat
-                fiyat         = orijinal
+                indirimli     = fiyat_anlık
+                fiyat         = fiyat_asıl
                 indirim_orani = round((1 - indirimli / fiyat) * 100, 1)
-            elif indirim_durum == "İndirimli":
+            elif indirim_durumu == "İndirimli":
                 # İndirimli ama fiyat bilgisi gelmiyor — işaretle
+                fiyat = fiyat_anlık
                 indirimli     = None
                 indirim_orani = -1.0  # -1 = indirimli ama oran bilinmiyor
             else:
+                fiyat = fiyat_anlık
                 indirimli     = None
                 indirim_orani = 0.0
 

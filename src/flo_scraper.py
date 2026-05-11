@@ -22,12 +22,15 @@ import schedule
 from datetime import datetime
 import random
 import file_operations as fo
+import biçimlendirici as biç
 import pathlib
 
 # ─── Ayarlar ────────────────────────────────────────────────────────────────
 THIS_DIR = pathlib.Path(__file__).parent
 DATA_FILE = THIS_DIR.parent / "data" / "flo_prices.json"
 CSV_FILE  = THIS_DIR.parent / "data" / "flo_prices.csv"
+
+ONDALIK_AYRACI = ','
 
 KATEGORI_URLS = [
     {
@@ -70,25 +73,6 @@ def tarayici_baslat():
     return driver
 
 # ─── Yardımcılar ─────────────────────────────────────────────────────────────
-
-def fiyat_temizle(fiyat_str: str) -> float:
-    """'1.299,90 TL' → 1299.90"""
-    if not fiyat_str:
-        return None
-    temiz = (
-        fiyat_str.replace("TL", "")
-                 .replace("\xa0", "")
-                 .replace(" ", "")
-                 .replace(".", "")
-                 .replace(",", ".")
-                 .strip()
-    )
-    try:
-        return float(temiz)
-    except ValueError:
-        return None
-
-
 
 def veri_kaydet(kayitlar: list) -> None:
     fo.AppendJsonFile(path=DATA_FILE, new_list=kayitlar)
@@ -154,16 +138,16 @@ def flo_scrape(driver, kategori_url: str, kategori_adi: str, sayfa_limit: int = 
                 yeni_el = pricing.select_one(".product-pricing-one__price")
 
                 if eski_el:
-                    fiyat     = fiyat_temizle(eski_el.get_text(strip=True))
-                    indirimli = fiyat_temizle(yeni_el.get_text(strip=True)) if yeni_el else None
+                    fiyat     = biç.FiyatTemizle(eski_el.get_text(strip=True), ONDALIK_AYRACI)
+                    indirimli = biç.FiyatTemizle(yeni_el.get_text(strip=True), ONDALIK_AYRACI) if yeni_el else None
                 elif yeni_el:
-                    fiyat     = fiyat_temizle(yeni_el.get_text(strip=True))
+                    fiyat     = biç.FiyatTemizle(yeni_el.get_text(strip=True), ONDALIK_AYRACI)
                     indirimli = None
 
                 # Hâlâ bulunamadıysa TL geçen tüm metinleri sırala
                 if not fiyat:
                     tl_metinler = [t for t in pricing.find_all(string=True) if "TL" in t]
-                    fiyatlar    = [fiyat_temizle(t) for t in tl_metinler if fiyat_temizle(t)]
+                    fiyatlar    = [biç.FiyatTemizle(t, ONDALIK_AYRACI) for t in tl_metinler if biç.FiyatTemizle(t, ONDALIK_AYRACI)]
                     fiyat       = fiyatlar[0] if fiyatlar else None
                     indirimli   = fiyatlar[1] if len(fiyatlar) > 1 else None
 
