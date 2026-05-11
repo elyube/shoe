@@ -9,6 +9,7 @@ class Shoe:
         fiyat : float,
         indirimli_fiyat : float | None,
         indirim_oranı : float,
+        site : str,
         url : str,
         kategori : str,
         zaman : datetime
@@ -18,6 +19,7 @@ class Shoe:
         self.setFiyat(fiyat)
         self.setİndirimliFiyat(indirimli_fiyat)
         self.setİndirimOranı(indirim_oranı)
+        self.setSite(site)
         self.setURL(url)
         self.setKategori(kategori),
         self.setZaman(zaman)
@@ -84,6 +86,12 @@ class Shoe:
     def setİndirimOranı(self, indirim_oranı:float) -> None:
         self.indirim_oranı = indirim_oranı
     
+    def getSite(self) -> str:
+        return self.site
+    
+    def setSite(self, site:str) -> None:
+        self.site = site
+
     def getURL(self) -> str:
         return self.url
     
