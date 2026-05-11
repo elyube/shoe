@@ -32,6 +32,7 @@ class Ayakkabı:
             "fiyat" : self.getFiyat(),
             "indirimli_fiyat" : self.getİndirimliFiyat(),
             "indirim_orani" : self.getİndirimOranı(),
+            "site" : self.getSite(),
             "url" : self.getURL(),
             "kategori" : self.getKategori(),
             "zaman" : self.getZaman().isoformat(timespec="seconds")
@@ -39,14 +40,15 @@ class Ayakkabı:
         return result
     
 
-    def fromJson(jason:dict) -> Shoe | None:
+    def fromJson(jason:dict) -> Ayakkabı | None:
         try:
-            result = Shoe(
+            result = Ayakkabı(
                 ad=jason.get("ad"),
                 marka=jason.get("marka"),
                 fiyat=jason.get("fiyat"),
                 indirimli_fiyat=jason.get("indirimli_fiyat"),
                 indirim_oranı=jason.get("indirim_orani"),
+                site=jason.get("site"),
                 url=jason.get("url"),
                 kategori=jason.get("kategori"),
                 zaman=datetime.fromisoformat(jason.get("zaman"))

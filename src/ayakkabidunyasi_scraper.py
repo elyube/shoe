@@ -126,7 +126,7 @@ def ayakkabidunyasi_scrape(driver, kategori_url: str, kategori_adi: str, sayfa_l
             # dimension17 = indirim durumu
             indirim_durumu = data.get("dimension17", "")
 
-            if fiyat_asıl and fiyat_asıl and fiyat_asıl > fiyat_anlık:
+            if fiyat_asıl and fiyat_anlık and fiyat_asıl > fiyat_anlık:
                 # JSON'da eski ve yeni fiyat farklıysa kullan
                 indirimli     = fiyat_anlık
                 fiyat         = fiyat_asıl
