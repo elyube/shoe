@@ -17,9 +17,17 @@ import os
 import time
 import random
 from datetime import datetime
+import file_operations as fo
+import pathlib
 
-DATA_FILE = "ayakkabidunyasi_prices.json"
-CSV_FILE  = "ayakkabidunyasi_prices.csv"
+
+# Output file paths configuration
+THIS_DIR = pathlib.Path(__file__).parent
+DATA_DIR = THIS_DIR.parent / "data"
+
+DATA_FILE = DATA_DIR / "ayakkabidunyasi_prices.json"
+CSV_FILE  = DATA_DIR / "ayakkabidunyasi_prices.csv"
+
 
 KATEGORI_URLS = [
     {
@@ -43,15 +51,8 @@ def tarayici_baslat():
     service = Service(ChromeDriverManager().install())
     return webdriver.Chrome(service=service, options=options)
 
-def veri_yukle() -> list:
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return []
-
 def veri_kaydet(kayitlar: list) -> None:
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(kayitlar, f, ensure_ascii=False, indent=2)
+    fo.AppendJsonFile(path=DATA_FILE, new_list=kayitlar)
     df = pd.DataFrame(kayitlar)
     df.to_csv(CSV_FILE, index=False, encoding="utf-8-sig")
     print(f"  ✓ {len(kayitlar)} kayıt kaydedildi → {DATA_FILE} & {CSV_FILE}")
@@ -172,7 +173,7 @@ def tum_kategorileri_scrape():
     driver = tarayici_baslat()
 
     try:
-        mevcut = veri_yukle()
+        mevcut = fo.ReadFromJsonFile(DATA_FILE)
         yeni   = []
         for kat in KATEGORI_URLS:
             yeni += ayakkabidunyasi_scrape(driver, kat["url"], kat["ad"], sayfa_limit=5)
