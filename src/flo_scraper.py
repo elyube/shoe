@@ -100,7 +100,7 @@ def veri_kaydet(kayitlar: list) -> None:
 
 def flo_scrape(driver, kategori_url: str, kategori_adi: str, sayfa_limit: int = 3) -> list:
     urunler = []
-    zaman = datetime.now().isoformat(timespec="seconds")
+    zaman = datetime.now()
 
     for sayfa in range(1, sayfa_limit + 1):
 
@@ -178,16 +178,18 @@ def flo_scrape(driver, kategori_url: str, kategori_adi: str, sayfa_limit: int = 
             else:
                 indirim_orani = 0.0
 
-            urunler.append({
-                "ad":              ad,
-                "marka":           marka,
-                "fiyat":           fiyat,
-                "indirimli_fiyat": indirimli,
-                "indirim_orani":   indirim_orani,
-                "url":             urun_url,
-                "kategori":        kategori_adi,
-                "zaman":           zaman,
-            })
+            bulunan = Ayakkabı(
+                ad = ad,
+                marka = marka,
+                fiyat = fiyat,
+                indirimli_fiyat = indirimli,
+                indirim_oranı = indirim_orani,
+                site = "FLO",
+                url = urun_url,
+                kategori = kategori_adi,
+                zaman = zaman
+            )
+            urunler.append(bulunan.toJson())
 
         time.sleep(random.uniform(2.0, 3.5))
 

@@ -19,6 +19,7 @@ import random
 from datetime import datetime
 import file_operations as fo
 import pathlib
+from .models.ayakkabı import Ayakkabı
 
 
 # Output file paths configuration
@@ -59,7 +60,7 @@ def veri_kaydet(kayitlar: list) -> None:
 
 def ayakkabidunyasi_scrape(driver, kategori_url: str, kategori_adi: str, sayfa_limit: int = 5) -> list:
     urunler = []
-    zaman = datetime.now().isoformat(timespec="seconds")
+    zaman = datetime.now()
     goruldu = set()
 
     for sayfa in range(1, sayfa_limit + 1):
@@ -145,17 +146,18 @@ def ayakkabidunyasi_scrape(driver, kategori_url: str, kategori_adi: str, sayfa_l
             href     = link_el["href"] if link_el else ""
             urun_url = "https://www.ayakkabidunyasi.com.tr" + href if href.startswith("/") else href
 
-            urunler.append({
-                "ad":              ad,
-                "marka":           marka,
-                "fiyat":           fiyat,
-                "indirimli_fiyat": indirimli,
-                "indirim_orani":   indirim_orani,
-                "url":             urun_url,
-                "kategori":        kategori_adi,
-                "site":            "Ayakkabı Dünyası",
-                "zaman":           zaman,
-            })
+            bulunan = Ayakkabı(
+                ad = ad,
+                marka = marka,
+                fiyat = fiyat,
+                indirimli_fiyat = indirimli,
+                indirim_oranı = indirim_orani,
+                site = "Ayakkabı Dünyası",
+                url = urun_url,
+                kategori = kategori_adi,
+                zaman = zaman
+            )
+            urunler.append(bulunan.toJson())
             yeni_urun += 1
 
         print(f"    ✓ {yeni_urun} yeni ürün eklendi, toplam: {len(goruldu)}")

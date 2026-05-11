@@ -1,6 +1,6 @@
 from datetime import datetime
 
-class Atakkabı:
+class Ayakkabı:
 
     def __init__(
         self,

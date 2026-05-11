@@ -18,6 +18,7 @@ import random
 from datetime import datetime
 import file_operations as fo
 import pathlib
+from .models.ayakkabı import Ayakkabı
 
 
 THIS_DIR = pathlib.Path(__file__).parent
@@ -73,7 +74,7 @@ def veri_kaydet(kayitlar: list) -> None:
 
 def derimod_scrape(driver, kategori_url: str, kategori_adi: str, sayfa_limit: int = 5) -> list:
     urunler = []
-    zaman = datetime.now().isoformat(timespec="seconds")
+    zaman = datetime.now()
 
     for sayfa in range(1, sayfa_limit + 1):
         url = f"{kategori_url}&page={sayfa}" if "?" in kategori_url else f"{kategori_url}?page={sayfa}"
@@ -171,17 +172,18 @@ def derimod_scrape(driver, kategori_url: str, kategori_adi: str, sayfa_limit: in
             href     = link_el["href"] if link_el else ""
             urun_url = "https://derimod.com.tr" + href if href.startswith("/") else href
 
-            urunler.append({
-                "ad":              ad,
-                "marka":           marka,
-                "fiyat":           fiyat,
-                "indirimli_fiyat": indirimli,
-                "indirim_orani":   indirim_orani,
-                "url":             urun_url,
-                "kategori":        kategori_adi,
-                "site":            "Derimod",
-                "zaman":           zaman,
-            })
+            bulunan = Ayakkabı(
+                ad = ad,
+                marka = marka,
+                fiyat = fiyat,
+                indirimli_fiyat = indirimli,
+                indirim_oranı = indirim_orani,
+                site = "Derimod",
+                url = urun_url,
+                kategori = kategori_adi,
+                zaman = zaman
+            )
+            urunler.append(bulunan.toJson())
 
         time.sleep(random.uniform(2.0, 3.0))
 
