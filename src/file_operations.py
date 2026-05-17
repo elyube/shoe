@@ -20,7 +20,7 @@ def AppendJsonFile(path:str, new_list:list) -> bool:
 
     try:
         f = open(file=path, mode="wt")
-        json.dump(new, f)
+        json.dump(new, f, ensure_ascii=False, indent=2)
         f.close()
         return True
     except:
@@ -30,6 +30,6 @@ def AppendJsonFile(path:str, new_list:list) -> bool:
 def RecordNewData(new_records:list, json_path:str, csv_path:str, quiet:bool=True):
     AppendJsonFile(path=json_path, new_list=new_records)
     df = pandas.DataFrame(new_records)
-    df.to_csv(CSV_FILE, mode="a", index=False, header=False)
+    df.to_csv(csv_path, mode="a", index=False, header=False)
     if not quiet:
         print(f"✓ {len(new_records)} kayıt kaydedildi → {json_path} & {csv_path}")

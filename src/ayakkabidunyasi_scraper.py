@@ -9,7 +9,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import pandas as pd
 import json
@@ -20,7 +19,7 @@ from datetime import datetime
 import file_operations as fo
 import biçimlendirici as biç
 import pathlib
-from .models.ayakkabı import Ayakkabı
+from models.ayakkabı import Ayakkabı
 
 
 THIS_DIR = pathlib.Path(__file__).parent
@@ -50,8 +49,8 @@ def tarayici_baslat():
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_argument("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
-    service = Service(ChromeDriverManager().install())
-    return webdriver.Chrome(service=service, options=options)
+    
+    return webdriver.Chrome(options=options)
 
 
 def ayakkabidunyasi_scrape(driver, kategori_url: str, kategori_adi: str, sayfa_limit: int = 5) -> list:

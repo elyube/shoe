@@ -13,7 +13,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import pandas as pd
 import os
@@ -23,7 +22,7 @@ from datetime import datetime
 import random
 import file_operations as fo
 import biçimlendirici as biç
-from .models.ayakkabı import Ayakkabı
+from models.ayakkabı import Ayakkabı
 import pathlib
 
 # ─── Ayarlar ────────────────────────────────────────────────────────────────
@@ -69,8 +68,8 @@ def tarayici_baslat():
         "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
     )
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=options)
+    
+    driver = webdriver.Chrome(options=options)
     return driver
 
 

@@ -9,10 +9,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import pandas as pd
-import json
 import os
 import time
 import random
@@ -20,7 +18,7 @@ from datetime import datetime
 import pathlib
 import file_operations as fo
 import biçimlendirici as biç
-from .models.ayakkabı import Ayakkabı
+from models.ayakkabı import Ayakkabı
 
 THIS_DIR = pathlib.Path(__file__).parent
 DATA_DIR = THIS_DIR.parent / "data"
@@ -63,9 +61,7 @@ def tarayici_baslat():
         "Chrome/124.0.0.0 Safari/537.36"
     )
 
-    service = Service(ChromeDriverManager().install())
-
-    return webdriver.Chrome(service=service, options=options)
+    return webdriver.Chrome(options=options)
 
 
 def instreet_scrape(
@@ -252,7 +248,7 @@ def instreet_scrape(
                 kategori = kategori_adi,
                 zaman = zaman
             )
-            urunler.append(bulunan)
+            urunler.append(bulunan.toJson())
 
         time.sleep(random.uniform(2.0, 3.0))
 
