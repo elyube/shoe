@@ -17,9 +17,18 @@ import os
 import time
 import random
 from datetime import datetime
+import pathlib
+import file_operations as fo
+import biçimlendirici as biç
+from .models.ayakkabı import Ayakkabı
 
-DATA_FILE = "instreet_prices.json"
-CSV_FILE = "instreet_prices.csv"
+THIS_DIR = pathlib.Path(__file__).parent
+DATA_DIR = THIS_DIR.parent / "data"
+
+DATA_FILE = DATA_DIR / "instreet_prices.json"
+CSV_FILE = DATA_DIR / "instreet_prices.csv"
+
+ONDALIK_AYRACI = ','
 
 KATEGORI_URLS = [
     {
@@ -59,67 +68,14 @@ def tarayici_baslat():
     return webdriver.Chrome(service=service, options=options)
 
 
-def fiyat_temizle(fiyat_str: str) -> float:
-    if not fiyat_str:
-        return None
-
-    temiz = (
-        fiyat_str.replace("TL", "")
-        .replace("₺", "")
-        .replace("\xa0", "")
-        .replace(" ", "")
-        .replace(".", "")
-        .replace(",", ".")
-        .strip()
-    )
-
-    try:
-        return float(temiz)
-
-    except ValueError:
-        return None
-
-
-def veri_yukle() -> list:
-    if os.path.exists(DATA_FILE):
-
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-
-    return []
-
-
-def veri_kaydet(kayitlar: list) -> None:
-
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(
-            kayitlar,
-            f,
-            ensure_ascii=False,
-            indent=2
-        )
-
-    df = pd.DataFrame(kayitlar)
-
-    df.to_csv(
-        CSV_FILE,
-        index=False,
-        encoding="utf-8-sig"
-    )
-
-    print(f"✓ {len(kayitlar)} kayıt kaydedildi")
-
-
 def instreet_scrape(
     driver,
     kategori_url: str,
     kategori_adi: str,
     sayfa_limit: int = 3
 ) -> list:
-
     urunler = []
-
-    zaman = datetime.now().isoformat(timespec="seconds")
+    zaman = datetime.now()
 
     for sayfa in range(1, sayfa_limit + 1):
 
@@ -239,7 +195,7 @@ def instreet_scrape(
 
             for f in fiyat_metinleri:
 
-                temiz = fiyat_temizle(f)
+                temiz = biç.FiyatTemizle(f, ONDALIK_AYRACI)
 
                 if temiz is not None:
                     fiyatlar.append(temiz)
@@ -285,17 +241,18 @@ def instreet_scrape(
             if ad == "Bilinmiyor":
                 continue
 
-            urunler.append({
-                "ad": ad,
-                "marka": "InStreet",
-                "fiyat": fiyat,
-                "indirimli_fiyat": indirimli,
-                "indirim_orani": indirim_orani,
-                "url": urun_url,
-                "kategori": kategori_adi,
-                "site": "InStreet",
-                "zaman": zaman,
-            })
+            bulunan = Ayakkabı(
+                ad = ad,
+                marka = "",
+                fiyat = fiyat,
+                indirimli_fiyat = indirimli,
+                indirim_oranı = indirim_orani,
+                site = "InStreet",
+                url = urun_url,
+                kategori = kategori_adi,
+                zaman = zaman
+            )
+            urunler.append(bulunan)
 
         time.sleep(random.uniform(2.0, 3.0))
 
@@ -314,7 +271,7 @@ def tum_kategorileri_scrape():
 
     try:
 
-        mevcut = veri_yukle()
+        mevcut = fo.ReadFromJsonFile(DATA_FILE)
 
         yeni = []
 
@@ -335,7 +292,7 @@ def tum_kategorileri_scrape():
 
     mevcut += yeni
 
-    veri_kaydet(mevcut)
+    fo.RecordNewData(mevcut, json_path=DATA_FILE, csv_path=CSV_FILE, quiet=False)
 
     print(f"Toplam kayıt: {len(mevcut)}")
 

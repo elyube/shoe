@@ -53,11 +53,6 @@ def tarayici_baslat():
     service = Service(ChromeDriverManager().install())
     return webdriver.Chrome(service=service, options=options)
 
-def veri_kaydet(kayitlar: list) -> None:
-    fo.AppendJsonFile(path=DATA_FILE, new_list=kayitlar)
-    df = pd.DataFrame(kayitlar)
-    df.to_csv(CSV_FILE, index=False, encoding="utf-8-sig")
-    print(f"  ✓ {len(kayitlar)} kayıt kaydedildi → {DATA_FILE} & {CSV_FILE}")
 
 def ayakkabidunyasi_scrape(driver, kategori_url: str, kategori_adi: str, sayfa_limit: int = 5) -> list:
     urunler = []
@@ -183,7 +178,7 @@ def tum_kategorileri_scrape():
         print("  ✓ Tarayıcı kapatıldı.")
 
     mevcut += yeni
-    veri_kaydet(mevcut)
+    fo.RecordNewData(mevcut, json_path=DATA_FILE, csv_path=CSV_FILE, quiet=False)
     print(f"\n  Toplam kayıt: {len(mevcut)}")
 
     if yeni:

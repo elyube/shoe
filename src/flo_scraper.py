@@ -23,6 +23,7 @@ from datetime import datetime
 import random
 import file_operations as fo
 import biçimlendirici as biç
+from .models.ayakkabı import Ayakkabı
 import pathlib
 
 # ─── Ayarlar ────────────────────────────────────────────────────────────────
@@ -72,13 +73,6 @@ def tarayici_baslat():
     driver = webdriver.Chrome(service=service, options=options)
     return driver
 
-# ─── Yardımcılar ─────────────────────────────────────────────────────────────
-
-def veri_kaydet(kayitlar: list) -> None:
-    fo.AppendJsonFile(path=DATA_FILE, new_list=kayitlar)
-    df = pd.DataFrame(kayitlar)
-    df.to_csv(CSV_FILE, mode="a", index=False, header=False)
-    print(f"  ✓ {len(kayitlar)} kayıt kaydedildi → {DATA_FILE} & {CSV_FILE}")
 
 # ─── Scraping ────────────────────────────────────────────────────────────────
 
@@ -200,7 +194,7 @@ def tum_kategorileri_scrape():
         print("  ✓ Tarayıcı kapatıldı.")
 
     mevcut += yeni
-    veri_kaydet(mevcut)
+    fo.RecordNewData(mevcut, json_path=DATA_FILE, csv_path=CSV_FILE, quiet=False)
     print(f"\n  Toplam kayıt: {len(mevcut)}")
 
     if yeni:
