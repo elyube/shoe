@@ -1,5 +1,6 @@
 import pandas
 import json
+import csv
 
 def ReadFromJsonFile(path:str) -> list:
     try:
@@ -30,6 +31,7 @@ def AppendJsonFile(path:str, new_list:list) -> bool:
 def RecordNewData(new_records:list, json_path:str, csv_path:str, quiet:bool=True):
     AppendJsonFile(path=json_path, new_list=new_records)
     df = pandas.DataFrame(new_records)
-    df.to_csv(csv_path, mode="a", index=False, header=False)
+    import csv
+    df.to_csv(csv_path, mode="a", index=False, header=False, quoting=csv.QUOTE_ALL) 
     if not quiet:
         print(f"✓ {len(new_records)} kayıt kaydedildi → {json_path} & {csv_path}")
