@@ -1,0 +1,462 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Ayakkabı Fiyat Analizi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px #ccc;
+        }
+        .value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px #ccc;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 20px;
+            margin-bottom: 35px;
+        }
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background: #222;
+            color: white;
+        }
+        img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+        a {
+            color: #1a73e8;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Ayakkabı Fiyat Karşılaştırma ve Karar Destek Analizi</h1>
+
+<div class="cards">
+    <div class="card">
+        <h2>🏆 En Ucuz Site</h2>
+        <div class="value">FLO</div>
+        <p>Ortalama fiyat: 2428.11 TL</p>
+    </div>
+
+    <div class="card">
+        <h2>🔥 En Yüksek İndirim</h2>
+        <div class="value">70.0%</div>
+        <p>Derimod</p>
+        <p>Derimod studio kadın leopar bağcıklı desenli sneaker</p>
+    </div>
+
+    <div class="card">
+        <h2>💸 En Çok İndirimli Ürün</h2>
+        <div class="value">Derimod</div>
+        <p>1603 indirimli ürün</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2>📌 Kullanıcı İçin Sonuç</h2>
+    <p>
+        Ortalama fiyatlara göre en avantajlı site <b>FLO</b>.
+        En yüksek indirim oranı ise <b>Derimod</b> sitesinde görülmüştür.
+        Düşük fiyat arayan kullanıcılar için FLO,
+        yüksek kampanya arayan kullanıcılar için Derimod daha avantajlıdır.
+    </p>
+</div>
+
+<div class="section">
+    <h2>📊 Tüm Sitelerin Ortalama Fiyat Grafiği</h2>
+    <img src="site_karsilastirma.png">
+</div>
+
+<div class="section">
+    <h2>🔥 Site Bazlı İndirimli Ürün Sayısı</h2>
+    <img src="indirimli_urun_sayisi.png">
+</div>
+
+<h2>Site Bazlı Fiyat Karşılaştırması</h2>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>site</th>
+      <th>Urun_Sayisi</th>
+      <th>Ortalama_Fiyat</th>
+      <th>En_Ucuz</th>
+      <th>En_Pahali</th>
+      <th>Ortalama_Indirim</th>
+      <th>Indirimli_Urun_Sayisi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Ayakkabı Dünyası</td>
+      <td>3500</td>
+      <td>4026.60</td>
+      <td>759.99</td>
+      <td>9999.99</td>
+      <td>-0.31</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>3356</td>
+      <td>4332.62</td>
+      <td>1499.99</td>
+      <td>7999.99</td>
+      <td>15.64</td>
+      <td>1603</td>
+    </tr>
+    <tr>
+      <td>FLO</td>
+      <td>681</td>
+      <td>2428.11</td>
+      <td>799.99</td>
+      <td>6199.00</td>
+      <td>6.26</td>
+      <td>144</td>
+    </tr>
+    <tr>
+      <td>InStreet</td>
+      <td>142</td>
+      <td>3634.99</td>
+      <td>899.99</td>
+      <td>4999.00</td>
+      <td>0.79</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Tarihe Göre Fiyat Dalgalanması</h2>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>tarih</th>
+      <th>site</th>
+      <th>Ortalama_Fiyat</th>
+      <th>Ortalama_Indirim</th>
+      <th>Urun_Sayisi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2026-04-28</td>
+      <td>Derimod</td>
+      <td>4102.64</td>
+      <td>21.44</td>
+      <td>759</td>
+    </tr>
+    <tr>
+      <td>2026-04-28</td>
+      <td>FLO</td>
+      <td>2444.86</td>
+      <td>6.55</td>
+      <td>342</td>
+    </tr>
+    <tr>
+      <td>2026-05-06</td>
+      <td>Ayakkabı Dünyası</td>
+      <td>3971.86</td>
+      <td>-0.32</td>
+      <td>970</td>
+    </tr>
+    <tr>
+      <td>2026-05-06</td>
+      <td>Derimod</td>
+      <td>3932.37</td>
+      <td>22.25</td>
+      <td>755</td>
+    </tr>
+    <tr>
+      <td>2026-05-06</td>
+      <td>FLO</td>
+      <td>2411.20</td>
+      <td>5.96</td>
+      <td>339</td>
+    </tr>
+    <tr>
+      <td>2026-05-11</td>
+      <td>InStreet</td>
+      <td>3693.92</td>
+      <td>1.44</td>
+      <td>39</td>
+    </tr>
+    <tr>
+      <td>2026-05-17</td>
+      <td>Ayakkabı Dünyası</td>
+      <td>4052.67</td>
+      <td>-0.30</td>
+      <td>1000</td>
+    </tr>
+    <tr>
+      <td>2026-05-17</td>
+      <td>Derimod</td>
+      <td>4576.86</td>
+      <td>10.90</td>
+      <td>761</td>
+    </tr>
+    <tr>
+      <td>2026-05-17</td>
+      <td>InStreet</td>
+      <td>3550.38</td>
+      <td>0.00</td>
+      <td>39</td>
+    </tr>
+    <tr>
+      <td>2026-05-20</td>
+      <td>Ayakkabı Dünyası</td>
+      <td>4052.72</td>
+      <td>-0.30</td>
+      <td>996</td>
+    </tr>
+    <tr>
+      <td>2026-05-20</td>
+      <td>Derimod</td>
+      <td>4584.75</td>
+      <td>10.75</td>
+      <td>761</td>
+    </tr>
+    <tr>
+      <td>2026-05-20</td>
+      <td>InStreet</td>
+      <td>3527.28</td>
+      <td>1.44</td>
+      <td>39</td>
+    </tr>
+    <tr>
+      <td>2026-05-26</td>
+      <td>Ayakkabı Dünyası</td>
+      <td>4028.51</td>
+      <td>-0.30</td>
+      <td>534</td>
+    </tr>
+    <tr>
+      <td>2026-05-26</td>
+      <td>Derimod</td>
+      <td>4642.02</td>
+      <td>9.20</td>
+      <td>320</td>
+    </tr>
+    <tr>
+      <td>2026-05-26</td>
+      <td>InStreet</td>
+      <td>3843.04</td>
+      <td>0.00</td>
+      <td>25</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Kullanıcı İçin Avantajlı Ürünler</h2>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>site</th>
+      <th>ad</th>
+      <th>analiz_fiyati</th>
+      <th>indirim_orani</th>
+      <th>kategori</th>
+      <th>url</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Derimod</td>
+      <td>Derimod studio kadın leopar bağcıklı desenli sneaker</td>
+      <td>2399.99</td>
+      <td>70.0</td>
+      <td>Kadın Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/derimod-studio-kadin-leopar-bagcikli-desenli-sneaker-25afd4353w2-5637145453" target="_blank">https://derimod.com.tr/products/derimod-studio-kadin-leopar-bagcikli-desenli-sneaker-25afd4353w2-5637145453</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Derimod studio kadın siyah bağcıklı kalın tabanlı sneaker</td>
+      <td>2699.99</td>
+      <td>70.0</td>
+      <td>Kadın Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/derimod-studio-kadin-gumus-bagcikli-kalin-tabanli-sneaker-25afd435114-5637145591" target="_blank">https://derimod.com.tr/products/derimod-studio-kadin-gumus-bagcikli-kalin-tabanli-sneaker-25afd435114-5637145591</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Derimod studio kadın siyah bağcıklı kalın tabanlı sneaker</td>
+      <td>2699.99</td>
+      <td>70.0</td>
+      <td>Kadın Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/derimod-studio-kadin-beyaz-bagcikli-kalin-tabanli-sneaker-25afd43526f-5637145326" target="_blank">https://derimod.com.tr/products/derimod-studio-kadin-beyaz-bagcikli-kalin-tabanli-sneaker-25afd43526f-5637145326</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Derimod studio erkek gri bağcıklı kalın tabanlı sneaker</td>
+      <td>2699.99</td>
+      <td>70.0</td>
+      <td>Erkek Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/derimod-studio-erkek-siyah-bagcikli-kalin-tabanli-sneaker-25wfd780114-5637145339" target="_blank">https://derimod.com.tr/products/derimod-studio-erkek-siyah-bagcikli-kalin-tabanli-sneaker-25wfd780114-5637145339</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Geox kadın beyaz spherica ecub-2 bağcıklı deri sneaker</td>
+      <td>2999.99</td>
+      <td>70.0</td>
+      <td>Kadın Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/geox-kadin-beyaz-spherica-ecub-2-bagcikli-deri-sneaker-d46wva00085c1000" target="_blank">https://derimod.com.tr/products/geox-kadin-beyaz-spherica-ecub-2-bagcikli-deri-sneaker-d46wva00085c1000</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Derimod zero kadın gri kalın tabanlı bağcıklı kumaş sneaker</td>
+      <td>1899.99</td>
+      <td>65.5</td>
+      <td>Kadın Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/derimod-zero-kadin-gri-kalin-tabanli-bagcikli-kumas-sneaker-25sfd43166f" target="_blank">https://derimod.com.tr/products/derimod-zero-kadin-gri-kalin-tabanli-bagcikli-kumas-sneaker-25sfd43166f</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Derimod zero kadın bej kalın tabanlı bağcıklı kumaş sneaker</td>
+      <td>1899.99</td>
+      <td>65.5</td>
+      <td>Kadın Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/derimod-zero-kadin-bej-kalin-tabanli-bagcikli-kumas-sneaker-25sfd43166f" target="_blank">https://derimod.com.tr/products/derimod-zero-kadin-bej-kalin-tabanli-bagcikli-kumas-sneaker-25sfd43166f</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Derimod zero kadın vizon bağcıklı kalın tabanlı sneaker</td>
+      <td>1699.99</td>
+      <td>64.2</td>
+      <td>Kadın Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/derimod-zero-kadin-bej-bagcikli-kalin-tabanli-sneaker-25sfd43146f" target="_blank">https://derimod.com.tr/products/derimod-zero-kadin-bej-bagcikli-kalin-tabanli-sneaker-25sfd43146f</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Derimod zero kadın bej bağcıklı kalın tabanlı sneaker</td>
+      <td>1699.99</td>
+      <td>64.2</td>
+      <td>Kadın Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/derimod-zero-kadin-vizon-bagcikli-kalin-tabanli-sneaker-25sfd43146f" target="_blank">https://derimod.com.tr/products/derimod-zero-kadin-vizon-bagcikli-kalin-tabanli-sneaker-25sfd43146f</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Kadın çok renkli bağcıklı kalın tabanlı örgülü sneaker</td>
+      <td>1999.99</td>
+      <td>63.6</td>
+      <td>Kadın Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/kadin-bej-bagcikli-kalin-tabanli-orgulu-sneaker-25sfd43086f" target="_blank">https://derimod.com.tr/products/kadin-bej-bagcikli-kalin-tabanli-orgulu-sneaker-25sfd43086f</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Erkek bej bağcıklı kalın tabanlı sneaker</td>
+      <td>2299.99</td>
+      <td>61.7</td>
+      <td>Erkek Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/erkek-siyah-bagcikli-kalin-tabanli-sneaker-25sfd76016f" target="_blank">https://derimod.com.tr/products/erkek-siyah-bagcikli-kalin-tabanli-sneaker-25sfd76016f</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Erkek siyah bağcıklı kalın tabanlı sneaker</td>
+      <td>2299.99</td>
+      <td>61.7</td>
+      <td>Erkek Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/erkek-bej-bagcikli-kalin-tabanli-sneaker-25sfd76016f" target="_blank">https://derimod.com.tr/products/erkek-bej-bagcikli-kalin-tabanli-sneaker-25sfd76016f</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Kadın bej bağcıklı kalın tabanlı sneaker</td>
+      <td>2699.99</td>
+      <td>61.4</td>
+      <td>Kadın Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/kadin-beyaz-bagcikli-kalin-tabanli-sneaker-25sfe49626f" target="_blank">https://derimod.com.tr/products/kadin-beyaz-bagcikli-kalin-tabanli-sneaker-25sfe49626f</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Kadın beyaz bağcıklı kalın tabanlı sneaker</td>
+      <td>2699.99</td>
+      <td>61.4</td>
+      <td>Kadın Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/kadin-bej-bagcikli-kalin-tabanli-sneaker-25sfe49626f-5637145330" target="_blank">https://derimod.com.tr/products/kadin-bej-bagcikli-kalin-tabanli-sneaker-25sfe49626f-5637145330</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Kadın siyah bağcıklı süet deri sneaker</td>
+      <td>2299.99</td>
+      <td>60.0</td>
+      <td>Kadın Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/kadin-kahverengi-bagcikli-suet-deri-sneaker-25afd370910-5637145360" target="_blank">https://derimod.com.tr/products/kadin-kahverengi-bagcikli-suet-deri-sneaker-25afd370910-5637145360</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Erkek kahverengi bağcıklı süet deri sneaker</td>
+      <td>2599.99</td>
+      <td>60.0</td>
+      <td>Erkek Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/erkek-kahverengi-bagcikli-suet-deri-sneaker-25wfd613010-5637145360" target="_blank">https://derimod.com.tr/products/erkek-kahverengi-bagcikli-suet-deri-sneaker-25wfd613010-5637145360</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Erkek siyah kalın tabanlı deri sneaker</td>
+      <td>2599.99</td>
+      <td>60.0</td>
+      <td>Erkek Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/erkek-siyah-kalin-tabanli-deri-sneaker-25wfd604914-5637145339" target="_blank">https://derimod.com.tr/products/erkek-siyah-kalin-tabanli-deri-sneaker-25wfd604914-5637145339</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Kadın siyah bağcıklı kalın tabanlı deri sneaker</td>
+      <td>2699.99</td>
+      <td>60.0</td>
+      <td>Kadın Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/kadin-bej-bagcikli-kalin-tabanli-deri-sneaker-25afd142014-5637145330" target="_blank">https://derimod.com.tr/products/kadin-bej-bagcikli-kalin-tabanli-deri-sneaker-25afd142014-5637145330</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Kadın bordo süet deri sneaker</td>
+      <td>2799.99</td>
+      <td>60.0</td>
+      <td>Kadın Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/kadin-leopar-suet-deri-sneaker-25wfd142314-5637145453" target="_blank">https://derimod.com.tr/products/kadin-leopar-suet-deri-sneaker-25wfd142314-5637145453</a></td>
+    </tr>
+    <tr>
+      <td>Derimod</td>
+      <td>Erkek siyah bağcıklı deri sneaker</td>
+      <td>3599.99</td>
+      <td>60.0</td>
+      <td>Erkek Spor Ayakkabı</td>
+      <td><a href="https://derimod.com.tr/products/erkek-siyah-bagcikli-deri-sneaker-25wfd691418-5637145339" target="_blank">https://derimod.com.tr/products/erkek-siyah-bagcikli-deri-sneaker-25wfd691418-5637145339</a></td>
+    </tr>
+  </tbody>
+</table>
+
+</body>
+</html>
