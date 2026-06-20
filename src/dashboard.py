@@ -5,18 +5,21 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+REPORTS_DIR = BASE_DIR / "reports"
+VISUALS_DIR = BASE_DIR / "visuals"
+SRC_DIR = BASE_DIR / "src"
 
 # Verileri yükle
-site      = pd.read_csv(BASE_DIR / "site_bazli_analiz.csv")
-avantajli = pd.read_csv(BASE_DIR / "kullanici_icin_avantajli_urunler.csv")
-tarih     = pd.read_csv(BASE_DIR / "tarih_bazli_fiyat_dalgalanmasi.csv")
-erkek     = pd.read_csv(BASE_DIR / "erkek_avantajli.csv")
-kadin     = pd.read_csv(BASE_DIR / "kadin_avantajli.csv")
+site      = pd.read_csv(REPORTS_DIR / "site_bazli_analiz.csv")
+avantajli = pd.read_csv(REPORTS_DIR / "kullanici_icin_avantajli_urunler.csv")
+tarih     = pd.read_csv(REPORTS_DIR / "tarih_bazli_fiyat_dalgalanmasi.csv")
+erkek     = pd.read_csv(REPORTS_DIR / "erkek_avantajli.csv")
+kadin     = pd.read_csv(REPORTS_DIR / "kadin_avantajli.csv")
 
-cinsiyet_path = BASE_DIR / "cinsiyet_site_analizi.csv"
+cinsiyet_path = REPORTS_DIR / "cinsiyet_site_analizi.csv"
 cinsiyet = pd.read_csv(cinsiyet_path) if cinsiyet_path.exists() else pd.DataFrame()
 
-marka_path = BASE_DIR / "marka_site_karsilastirma.csv"
+marka_path = REPORTS_DIR / "marka_site_karsilastirma.csv"
 marka = pd.read_csv(marka_path) if marka_path.exists() else pd.DataFrame()
 
 avantajli = avantajli.drop_duplicates(subset=["site", "url"])
@@ -32,7 +35,7 @@ plt.xticks(rotation=15)
 for i, v in enumerate(site["Ortalama_Fiyat"]):
     plt.text(i, v + 50, f"{v:,.0f} TL", ha="center", fontsize=9, fontweight="bold")
 plt.tight_layout()
-plt.savefig(BASE_DIR / "site_karsilastirma.png", dpi=150)
+plt.savefig(VISUALS_DIR / "site_karsilastirma.png", dpi=150)
 plt.close()
 
 # Grafik 2: İndirimli ürün sayısı
@@ -43,7 +46,7 @@ plt.xlabel("Site")
 plt.ylabel("İndirimli Ürün Sayısı")
 plt.xticks(rotation=15)
 plt.tight_layout()
-plt.savefig(BASE_DIR / "indirimli_urun_sayisi.png", dpi=150)
+plt.savefig(VISUALS_DIR / "indirimli_urun_sayisi.png", dpi=150)
 plt.close()
 
 # Grafik 3: Kadın vs Erkek fiyat karşılaştırması
@@ -61,7 +64,7 @@ if not cinsiyet.empty and "cinsiyet" in cinsiyet.columns:
     ax.set_ylabel("Ortalama Fiyat (TL)")
     ax.legend()
     plt.tight_layout()
-    plt.savefig(BASE_DIR / "cinsiyet_karsilastirma.png", dpi=150)
+    plt.savefig(VISUALS_DIR / "cinsiyet_karsilastirma.png", dpi=150)
     plt.close()
 
 en_ucuz             = site.sort_values("Ortalama_Fiyat").iloc[0]
@@ -86,7 +89,7 @@ def tablo_html(df, kolonlar, baslik=""):
     basliklar = "".join(f"<th>{k}</th>" for k in kolonlar)
     return f"<table><thead><tr>{basliklar}</tr></thead><tbody>{satirlar}</tbody></table>"
 
-cinsiyet_grafik = '<img src="cinsiyet_karsilastirma.png">' if (BASE_DIR / "cinsiyet_karsilastirma.png").exists() else ""
+cinsiyet_grafik = '<img src="cinsiyet_karsilastirma.png">' if (VISUALS_DIR / "cinsiyet_karsilastirma.png").exists() else ""
 
 marka_tablo = ""
 if not marka.empty:
@@ -192,6 +195,6 @@ html = f"""<!DOCTYPE html>
 </body>
 </html>"""
 
-output = BASE_DIR / "analiz_dashboard.html"
+output = SRC_DIR / "analiz_dashboard.html"
 output.write_text(html, encoding="utf-8")
 print("Arayüz oluşturuldu:", output)

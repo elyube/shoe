@@ -3,6 +3,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
+REPORTS_DIR = BASE_DIR / "reports"
 
 files = {
     "FLO": DATA_DIR / "flo_prices.csv",
@@ -138,14 +139,14 @@ avantajli = (
     .drop_duplicates(subset=["site", "url"])
 )
 
-site_ozet.to_csv(BASE_DIR / "site_bazli_analiz.csv", encoding="utf-8-sig")
-tarih_analiz.to_csv(BASE_DIR / "tarih_bazli_fiyat_dalgalanmasi.csv", encoding="utf-8-sig")
-cinsiyet_site.to_csv(BASE_DIR / "cinsiyet_site_analizi.csv", encoding="utf-8-sig")
-avantajli.head(50).to_csv(BASE_DIR / "kullanici_icin_avantajli_urunler.csv", encoding="utf-8-sig", index=False)
-erkek_avantajli.to_csv(BASE_DIR / "erkek_avantajli.csv", encoding="utf-8-sig", index=False)
-kadin_avantajli.to_csv(BASE_DIR / "kadin_avantajli.csv", encoding="utf-8-sig", index=False)
+site_ozet.to_csv(REPORTS_DIR / "site_bazli_analiz.csv", encoding="utf-8-sig")
+tarih_analiz.to_csv(REPORTS_DIR / "tarih_bazli_fiyat_dalgalanmasi.csv", encoding="utf-8-sig")
+cinsiyet_site.to_csv(REPORTS_DIR / "cinsiyet_site_analizi.csv", encoding="utf-8-sig")
+avantajli.head(50).to_csv(REPORTS_DIR / "kullanici_icin_avantajli_urunler.csv", encoding="utf-8-sig", index=False)
+erkek_avantajli.to_csv(REPORTS_DIR / "erkek_avantajli.csv", encoding="utf-8-sig", index=False)
+kadin_avantajli.to_csv(REPORTS_DIR / "kadin_avantajli.csv", encoding="utf-8-sig", index=False)
 
 if not marka_df.empty:
-    marka_site.to_csv(BASE_DIR / "marka_site_karsilastirma.csv", encoding="utf-8-sig")
+    marka_site.to_csv(REPORTS_DIR / "marka_site_karsilastirma.csv", encoding="utf-8-sig")
 
 print("\nAnaliz dosyaları oluşturuldu.")
