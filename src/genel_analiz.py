@@ -105,7 +105,8 @@ site_ozet = df.groupby("site").agg(
     En_Ucuz=("analiz_fiyati", "min"),
     En_Pahali=("analiz_fiyati", "max"),
     Ortalama_Indirim=("indirim_orani", "mean"),
-    Indirimli_Urun_Sayisi=("indirim_orani", lambda x: (x > 0).sum())
+    Indirimli_Urun_Sayisi=("indirim_orani", lambda x: (x > 0).sum()),
+    Indirimli_Urun_Orani=("indirim_orani", lambda x: ((x > 0).sum() / len(x)) * 100)
 ).round(2)
 print(site_ozet)
 

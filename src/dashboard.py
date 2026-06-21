@@ -38,15 +38,15 @@ plt.tight_layout()
 plt.savefig(VISUALS_DIR / "site_karsilastirma.png", dpi=150)
 plt.close()
 
-# Grafik 2: İndirimli ürün sayısı
+# Grafik 2: İndirimli ürün oranı
 plt.figure(figsize=(9, 5))
-plt.bar(site["site"], site["Indirimli_Urun_Sayisi"], color=renkler[:len(site)])
-plt.title("Site Bazlı İndirimli Ürün Sayısı")
+plt.bar(site["site"], site["Indirimli_Urun_Orani"], color=renkler[:len(site)])
+plt.title("Site Bazlı İndirimli Ürün Oranı (%)")
 plt.xlabel("Site")
-plt.ylabel("İndirimli Ürün Sayısı")
+plt.ylabel("İndirimli Ürün Oranı (%)")
 plt.xticks(rotation=15)
-for i, v in enumerate(site["Indirimli_Urun_Sayisi"]):
-    plt.text(i, v + max(site["Indirimli_Urun_Sayisi"])*0.02, str(int(v)), ha="center", fontsize=9, fontweight="bold")
+for i, v in enumerate(site["Indirimli_Urun_Orani"]):
+    plt.text(i, v + max(site["Indirimli_Urun_Orani"])*0.02, f"%{v:.1f}", ha="center", fontsize=9, fontweight="bold")
 plt.tight_layout()
 plt.savefig(VISUALS_DIR / "indirimli_urun_sayisi.png", dpi=150)
 plt.close()
