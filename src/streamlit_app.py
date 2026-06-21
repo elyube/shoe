@@ -47,13 +47,21 @@ def veri_yukle():
         df["site"] = site
         df["zaman"] = pd.to_datetime(df["zaman"], errors="coerce")
         df["tarih"] = df["zaman"].dt.date
-        df["analiz_fiyati"] = pd.to_numeric(
-            df.get("indirimli_fiyat", df["fiyat"]).fillna(df["fiyat"]),
-            errors="coerce"
-        )
-        df["indirim_orani"] = pd.to_numeric(
-            df.get("indirim_orani", 0), errors="coerce"
-        ).fillna(0)
+        df["fiyat"] = pd.to_numeric(df["fiyat"], errors="coerce")
+        if "indirimli_fiyat" in df.columns:
+            df["indirimli_fiyat"] = pd.to_numeric(df["indirimli_fiyat"], errors="coerce")
+            
+        fiyat_kolonu = "indirimli_fiyat" if "indirimli_fiyat" in df.columns else "fiyat"
+        df["analiz_fiyati"] = df[fiyat_kolonu].fillna(df["fiyat"])
+        df["analiz_fiyati"] = pd.to_numeric(df["analiz_fiyati"], errors="coerce")
+        
+        hatali = df["fiyat"] > 50000
+        df.loc[hatali, "fiyat"] = df.loc[hatali, "analiz_fiyati"]
+        
+        df["indirim_orani"] = 0.0
+        if "indirimli_fiyat" in df.columns:
+            gecerli_indirim = (df["fiyat"] > 0) & df["indirimli_fiyat"].notna() & (df["indirimli_fiyat"] < df["fiyat"])
+            df.loc[gecerli_indirim, "indirim_orani"] = ((df.loc[gecerli_indirim, "fiyat"] - df.loc[gecerli_indirim, "indirimli_fiyat"]) / df.loc[gecerli_indirim, "fiyat"] * 100).round(2)
         all_data.append(df)
 
     df = pd.concat(all_data, ignore_index=True)
@@ -103,7 +111,7 @@ def veri_yukle():
         (df["ad"].apply(lambda x: any(k in str(x) for k in spor_anahtar)))
     ].copy()
 
-    # Cinsiyeti ad'dan tahmin et
+    # Cinsiyeti ad'dan tahmin et (FLO indirimli için kategori düzeltme)
     def cinsiyet_tahmin(ad):
         ad = str(ad).lower()
         if "erkek" in ad:
@@ -121,9 +129,24 @@ def veri_yukle():
     df = df[df["analiz_fiyati"].notna()]
     df = df.drop_duplicates(subset=["site", "ad", "url", "tarih"])
 
-    df["cinsiyet"] = df["kategori"].apply(
-        lambda x: "Erkek" if "Erkek" in x else "Kadın"
-    )
+    # Cinsiyet sütunu ekle (genel_analiz.py ile aynı)
+    def belirle_cinsiyet(row):
+        ad = str(row["ad"]).lower()
+        if "erkek" in ad:
+            return "Erkek"
+        elif "kadın" in ad or "kadin" in ad:
+            return "Kadın"
+        elif "unisex" in ad:
+            return "Unisex"
+        
+        kat = str(row["kategori"]).lower()
+        if "erkek" in kat:
+            return "Erkek"
+        elif "kadın" in kat or "kadin" in kat:
+            return "Kadın"
+        return "Unisex"
+
+    df["cinsiyet"] = df.apply(belirle_cinsiyet, axis=1)
     return df
 
 df = veri_yukle()
@@ -140,7 +163,7 @@ st.sidebar.markdown("## 👟 Fiyat Takibi")
 st.sidebar.divider()
 st.sidebar.title("Filtreler")
 
-cinsiyet_sec = st.sidebar.radio("👤 Cinsiyet", ["Tümü", "Erkek", "Kadın"])
+cinsiyet_sec = st.sidebar.radio("👤 Cinsiyet", ["Tümü", "Erkek", "Kadın", "Unisex"])
 site_sec     = st.sidebar.multiselect(
     "🏪 Site",
     options=df["site"].unique().tolist(),
@@ -165,7 +188,7 @@ filtre = filtre[
 if cinsiyet_sec != "Tümü":
     filtre = filtre[filtre["cinsiyet"] == cinsiyet_sec]
 if sadece_indirimli:
-    filtre = filtre[filtre["indirim_orani"] != 0]
+    filtre = filtre[filtre["indirim_orani"] > 0]
 
 # ─── Başlık ──────────────────────────────────────────────────────────────────
 st.title("👟 Ayakkabı Fiyat ve İndirim Takibi")
@@ -183,7 +206,7 @@ en_ucuz_fiyat = filtre.groupby("site")["analiz_fiyati"].mean().min()
 
 c1.metric("🏆 En Ucuz Site", en_ucuz_site, f"{en_ucuz_fiyat:,.0f} TL ort.")
 c2.metric("📦 Toplam Ürün", f"{len(filtre):,}")
-c3.metric("🔥 İndirimli Ürün", f"{(filtre['indirim_orani'] != 0).sum():,}")
+c3.metric("🔥 İndirimli Ürün", f"{(filtre['indirim_orani'] > 0).sum():,}")
 c4.metric("💸 Max İndirim", f"%{filtre[filtre['indirim_orani'] > 0]['indirim_orani'].max():.0f}" if (filtre['indirim_orani'] > 0).any() else "—")
 
 st.divider()
@@ -257,16 +280,32 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 
 # ── Tab 1: Site Karşılaştırma ─────────────────────────────────────────────
 with tab1:
-    site_ort = filtre.groupby("site")["analiz_fiyati"].mean().reset_index()
-    site_ort.columns = ["Site", "Ortalama Fiyat (TL)"]
-    fig = px.bar(
-        site_ort, x="Site", y="Ortalama Fiyat (TL)",
-        color="Site", color_discrete_map=SITE_RENK,
-        title="Site Bazlı Ortalama Fiyat",
-        text_auto=".0f"
-    )
-    fig.update_layout(showlegend=False)
-    st.plotly_chart(fig, use_container_width=True)
+    site_ort = filtre.groupby("site").agg(
+        Ort_Fiyat=("analiz_fiyati", "mean"),
+        Indirimli_Oran=("indirim_orani", lambda x: ((x > 0).sum() / len(x)) * 100)
+    ).reset_index()
+    site_ort.columns = ["Site", "Ortalama Fiyat (TL)", "İndirimli Ürün Oranı (%)"]
+    
+    col_g1, col_g2 = st.columns(2)
+    with col_g1:
+        fig1 = px.bar(
+            site_ort, x="Site", y="Ortalama Fiyat (TL)",
+            color="Site", color_discrete_map=SITE_RENK,
+            title="Site Bazlı Ortalama Fiyat",
+            text_auto=".0f"
+        )
+        fig1.update_layout(showlegend=False)
+        st.plotly_chart(fig1, use_container_width=True)
+        
+    with col_g2:
+        fig2 = px.bar(
+            site_ort, x="Site", y="İndirimli Ürün Oranı (%)",
+            color="Site", color_discrete_map=SITE_RENK,
+            title="Site Bazlı İndirimli Ürün Oranı (%)",
+            text_auto=".1f"
+        )
+        fig2.update_layout(showlegend=False)
+        st.plotly_chart(fig2, use_container_width=True)
 
     st.subheader("Site Özet Tablosu")
 
@@ -276,7 +315,7 @@ with tab1:
         ort_fiyat    = grp["analiz_fiyati"].mean()
         min_fiyat    = grp["analiz_fiyati"].min()
         maks_fiyat   = grp["analiz_fiyati"].max()
-        indirimli_n  = (grp["indirim_orani"] != 0).sum()
+        indirimli_n  = (grp["indirim_orani"] > 0).sum()
         indirimli_pct= round(indirimli_n / toplam * 100, 1) if toplam > 0 else 0
         gercek_ind   = grp[grp["indirim_orani"] > 0]["indirim_orani"]
         ort_indirim  = round(gercek_ind.mean(), 1) if len(gercek_ind) >= 5 else None
@@ -311,7 +350,7 @@ with tab2:
             fig.update_layout(showlegend=False)
             st.plotly_chart(fig, use_container_width=True)
 
-            en_iyi = erkek_df[erkek_df["indirim_orani"] != 0].sort_values(
+            en_iyi = erkek_df[erkek_df["indirim_orani"] > 0].sort_values(
                 ["indirim_orani", "analiz_fiyati"], ascending=[False, True]
             ).head(5)
             st.caption("🔥 En avantajlı erkek ürünleri:")
@@ -331,7 +370,7 @@ with tab2:
             fig.update_layout(showlegend=False)
             st.plotly_chart(fig, use_container_width=True)
 
-            en_iyi = kadin_df[kadin_df["indirim_orani"] != 0].sort_values(
+            en_iyi = kadin_df[kadin_df["indirim_orani"] > 0].sort_values(
                 ["indirim_orani", "analiz_fiyati"], ascending=[False, True]
             ).head(5)
             st.caption("🔥 En avantajlı kadın ürünleri:")
@@ -389,9 +428,9 @@ with tab3:
 with tab4:
     st.subheader("🔥 En Yüksek İndirimli Ürünler")
 
-    cin_filtre = st.radio("Cinsiyet", ["Tümü", "Erkek", "Kadın"], horizontal=True, key="ind_cin")
+    cin_filtre = st.radio("Cinsiyet", ["Tümü", "Erkek", "Kadın", "Unisex"], horizontal=True, key="ind_cin")
 
-    ind_df = filtre[filtre["indirim_orani"] != 0].copy()
+    ind_df = filtre[filtre["indirim_orani"] > 0].copy()
     if cin_filtre != "Tümü":
         ind_df = ind_df[ind_df["cinsiyet"] == cin_filtre]
 
