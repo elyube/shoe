@@ -1,8 +1,12 @@
 ﻿cinsiyet,site,Ortalama_Fiyat,Indirimli_Urun,Urun_Sayisi
-Erkek,Ayakkabı Dünyası,3939.79,0,1582
-Erkek,Derimod,4581.96,657,1641
-Erkek,FLO,3071.67,44,144
-Kadın,Ayakkabı Dünyası,4176.18,0,1309
-Kadın,Derimod,4087.31,912,1639
-Kadın,FLO,2699.34,46,130
-Kadın,InStreet,3662.45,2,112
+Erkek,Ayakkabı Dünyası,4023.27,0,1755
+Erkek,Derimod,4555.79,747,1833
+Erkek,FLO,2856.73,22,321
+Erkek,InStreet,3744.33,1,63
+Kadın,Ayakkabı Dünyası,4292.66,0,1440
+Kadın,Derimod,4045.65,1051,1831
+Kadın,FLO,2618.29,14,283
+Kadın,InStreet,3689.33,2,43
+Unisex,Ayakkabı Dünyası,2623.9,0,218
+Unisex,FLO,3040.16,0,88
+Unisex,InStreet,3231.29,0,31

@@ -45,6 +45,8 @@ plt.title("Site Bazlı İndirimli Ürün Sayısı")
 plt.xlabel("Site")
 plt.ylabel("İndirimli Ürün Sayısı")
 plt.xticks(rotation=15)
+for i, v in enumerate(site["Indirimli_Urun_Sayisi"]):
+    plt.text(i, v + max(site["Indirimli_Urun_Sayisi"])*0.02, str(int(v)), ha="center", fontsize=9, fontweight="bold")
 plt.tight_layout()
 plt.savefig(VISUALS_DIR / "indirimli_urun_sayisi.png", dpi=150)
 plt.close()
@@ -58,6 +60,12 @@ if not cinsiyet.empty and "cinsiyet" in cinsiyet.columns:
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.bar([i - 0.2 for i in x], [erkek_fiyat.get(s, 0) for s in siteler], 0.4, label="Erkek", color="#2B6CB0")
     ax.bar([i + 0.2 for i in x], [kadin_fiyat.get(s, 0) for s in siteler], 0.4, label="Kadın", color="#E84C2B")
+    
+    for i, v in enumerate([erkek_fiyat.get(s, 0) for s in siteler]):
+        if v > 0: ax.text(i - 0.2, v + max(list(erkek_fiyat)+list(kadin_fiyat))*0.02, f"{v:,.0f}", ha="center", fontsize=8, fontweight="bold")
+    for i, v in enumerate([kadin_fiyat.get(s, 0) for s in siteler]):
+        if v > 0: ax.text(i + 0.2, v + max(list(erkek_fiyat)+list(kadin_fiyat))*0.02, f"{v:,.0f}", ha="center", fontsize=8, fontweight="bold")
+        
     ax.set_xticks(list(x))
     ax.set_xticklabels(siteler, rotation=15)
     ax.set_title("Cinsiyete Göre Ortalama Fiyat Karşılaştırması")
@@ -66,6 +74,34 @@ if not cinsiyet.empty and "cinsiyet" in cinsiyet.columns:
     plt.tight_layout()
     plt.savefig(VISUALS_DIR / "cinsiyet_karsilastirma.png", dpi=150)
     plt.close()
+
+# Grafik 4: İndirim Karşılaştırması (Ortalama İndirim Oranı)
+plt.figure(figsize=(9, 5))
+plt.bar(site["site"], site["Ortalama_Indirim"], color=renkler[:len(site)])
+plt.title("Site Bazlı Ortalama İndirim Oranı (%)")
+plt.xlabel("Site")
+plt.ylabel("Ortalama İndirim Oranı (%)")
+plt.xticks(rotation=15)
+for i, v in enumerate(site["Ortalama_Indirim"]):
+    plt.text(i, v + max(site["Ortalama_Indirim"])*0.02, f"%{v:.1f}", ha="center", fontsize=9, fontweight="bold")
+plt.tight_layout()
+plt.savefig(VISUALS_DIR / "indirim_karsilastirma.png", dpi=150)
+plt.close()
+
+# Grafik 5: Fiyat Dalgalanması (Zaman İçinde Fiyat)
+tarih["tarih"] = pd.to_datetime(tarih["tarih"])
+plt.figure(figsize=(10, 5))
+for s in tarih["site"].unique():
+    s_data = tarih[tarih["site"] == s]
+    plt.plot(s_data["tarih"], s_data["Ortalama_Fiyat"], marker='o', label=s)
+plt.title("Zamana Göre Ortalama Fiyat Dalgalanması")
+plt.xlabel("Tarih")
+plt.ylabel("Ortalama Fiyat (TL)")
+plt.xticks(rotation=15)
+plt.legend()
+plt.tight_layout()
+plt.savefig(VISUALS_DIR / "fiyat_dalgalanmasi.png", dpi=150)
+plt.close()
 
 en_ucuz             = site.sort_values("Ortalama_Fiyat").iloc[0]
 en_indirimli        = avantajli.sort_values("indirim_orani", ascending=False).iloc[0]
@@ -89,7 +125,9 @@ def tablo_html(df, kolonlar, baslik=""):
     basliklar = "".join(f"<th>{k}</th>" for k in kolonlar)
     return f"<table><thead><tr>{basliklar}</tr></thead><tbody>{satirlar}</tbody></table>"
 
-cinsiyet_grafik = '<img src="cinsiyet_karsilastirma.png">' if (VISUALS_DIR / "cinsiyet_karsilastirma.png").exists() else ""
+cinsiyet_grafik = '<img src="../visuals/cinsiyet_karsilastirma.png">' if (VISUALS_DIR / "cinsiyet_karsilastirma.png").exists() else ""
+fiyat_dalgalanmasi_grafik = '<img src="../visuals/fiyat_dalgalanmasi.png">' if (VISUALS_DIR / "fiyat_dalgalanmasi.png").exists() else ""
+indirim_karsilastirma_grafik = '<img src="../visuals/indirim_karsilastirma.png">' if (VISUALS_DIR / "indirim_karsilastirma.png").exists() else ""
 
 marka_tablo = ""
 if not marka.empty:
@@ -176,8 +214,10 @@ html = f"""<!DOCTYPE html>
 </div>
 
 <div class="section">
-    <h2>🔥 Site Bazlı İndirimli Ürün Sayısı</h2>
-    <img src="indirimli_urun_sayisi.png">
+    <h2>🔥 Site Bazlı İndirimli Ürün Sayısı ve Oranları</h2>
+    <img src="../visuals/indirimli_urun_sayisi.png">
+    <br><br>
+    <img src="../visuals/indirim_karsilastirma.png">
 </div>
 
 {marka_tablo}
@@ -185,6 +225,8 @@ html = f"""<!DOCTYPE html>
 <div class="section">
     <h2>📈 Tarihe Göre Fiyat Dalgalanması</h2>
     {tarih.to_html(index=False)}
+    <br><br>
+    {fiyat_dalgalanmasi_grafik}
 </div>
 
 <div class="section">

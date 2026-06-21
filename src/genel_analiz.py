@@ -19,10 +19,26 @@ for site, path in files.items():
     df["site"] = site
     df["zaman"] = pd.to_datetime(df["zaman"], errors="coerce")
     df["tarih"] = df["zaman"].dt.date
+    
+    
+    df["fiyat"] = pd.to_numeric(df["fiyat"], errors="coerce")
+    if "indirimli_fiyat" in df.columns:
+        df["indirimli_fiyat"] = pd.to_numeric(df["indirimli_fiyat"], errors="coerce")
+        
     fiyat_kolonu = "indirimli_fiyat" if "indirimli_fiyat" in df.columns else "fiyat"
     df["analiz_fiyati"] = df[fiyat_kolonu].fillna(df["fiyat"])
     df["analiz_fiyati"] = pd.to_numeric(df["analiz_fiyati"], errors="coerce")
-    df["indirim_orani"] = pd.to_numeric(df["indirim_orani"], errors="coerce").fillna(0)
+    
+    # Hatalı fiyatları (scraper hatasıyla gelen 35 Milyon vb. absürt fiyatlar) temizle
+    hatali = df["fiyat"] > 50000
+    df.loc[hatali, "fiyat"] = df.loc[hatali, "analiz_fiyati"]
+    
+    # İndirim oranını veri modelindeki alandan okumak yerine fiyatlardan dinamik hesapla
+    df["indirim_orani"] = 0.0
+    if "indirimli_fiyat" in df.columns:
+        gecerli_indirim = (df["fiyat"] > 0) & df["indirimli_fiyat"].notna() & (df["indirimli_fiyat"] < df["fiyat"])
+        df.loc[gecerli_indirim, "indirim_orani"] = ((df.loc[gecerli_indirim, "fiyat"] - df.loc[gecerli_indirim, "indirimli_fiyat"]) / df.loc[gecerli_indirim, "fiyat"] * 100).round(2)
+    
     all_data.append(df)
 
 df = pd.concat(all_data, ignore_index=True)
@@ -41,14 +57,41 @@ df["kategori"] = df["kategori"].astype(str)
 df = df.drop_duplicates(subset=["site", "ad", "url", "tarih"])
 df = df[df["analiz_fiyati"].notna()]
 
+# FLO için "İndirimli Ürünler" kategorisindeki spor ayakkabıları kurtar
+spor_anahtar = ["spor", "sneaker", "koşu", "running", "training", "yürüyüş", "krampon", "basketbol"]
+flo_ind_mask = (df["site"] == "FLO") & (df["kategori"] == "İndirimli Ürünler") & (df["ad"].apply(lambda x: any(k in str(x).lower() for k in spor_anahtar)))
+
+# Kurtarılan ürünlerin kategorisini cinsiyetlerine göre "Spor Ayakkabı" olarak düzelt
+def flo_kategori_duzelt(ad):
+    ad_lower = str(ad).lower()
+    if "kadın" in ad_lower or "kadin" in ad_lower:
+        return "Kadın Spor Ayakkabı"
+    return "Erkek Spor Ayakkabı"
+
+df.loc[flo_ind_mask, "kategori"] = df.loc[flo_ind_mask, "ad"].apply(flo_kategori_duzelt)
+
 # Sadece spor ayakkabı — adil karşılaştırma için
 SPOR_KATEGORILER = ["Erkek Spor Ayakkabı", "Kadın Spor Ayakkabı"]
 df = df[df["kategori"].isin(SPOR_KATEGORILER)]
 
 # Cinsiyet sütunu ekle
-df["cinsiyet"] = df["kategori"].apply(
-    lambda x: "Erkek" if "Erkek" in x else "Kadın"
-)
+def belirle_cinsiyet(row):
+    ad = str(row["ad"]).lower()
+    if "erkek" in ad:
+        return "Erkek"
+    elif "kadın" in ad or "kadin" in ad:
+        return "Kadın"
+    elif "unisex" in ad:
+        return "Unisex"
+    
+    kat = str(row["kategori"]).lower()
+    if "erkek" in kat:
+        return "Erkek"
+    elif "kadın" in kat or "kadin" in kat:
+        return "Kadın"
+    return "Unisex"
+
+df["cinsiyet"] = df.apply(belirle_cinsiyet, axis=1)
 
 print("=" * 60)
 print("GENEL AYAKKABI FİYAT ANALİZİ — SADECE SPOR AYAKKABI")
